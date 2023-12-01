@@ -1,7 +1,7 @@
 # Azure AI Studio: Python PromptFlow Sample
 
-This is the basic quickstart tutorial for the Azure AI Studio SDK (Python). Find framework-specific versions here:
- - [Azure AI Studio: Quickstart](https://github.com/Azure-Samples/aistudio-python-quickstart-sample)
+This is the basic quickstart tutorial for the Azure AI Studio with PromptFlow. Find framework-specific versions here:
+ - [Azure AI Studio SDK: Quickstart](https://github.com/Azure-Samples/aistudio-python-quickstart-sample)
  - [Azure AI Studio: Semantic Kernel Quickstart](https://github.com/Azure-Samples/aistudio-python-semantickernel-sample)
  - [Azure AI Studio: Langchain Quickstart](https://github.com/Azure-Samples/aistudio-python-langchain-sample)
 

@@ -9,7 +9,7 @@ Learn how you can use the Azure AI Studio, SDK and CLI, with Azure AI Services, 
 ## Learning Objectives
 
 By the end of this tutorial you'll learn how to:
- - Setup your development environment for building Azure AI Solutions
+ - Setup your development environment for building Azure AI Solutions and PromptFlow solution with Codespaces
  - Create an Azure AI Project and related resources for your copilot
  - Create an Azure AI Search resource and index for your custom data
  - Validate your copilot by asking it questions about your custom data
@@ -18,7 +18,7 @@ By the end of this tutorial you'll learn how to:
 
 ## Introduction
 
-This tutorial walks you through the steps to build, use, and evaluate, a copilot implementation on a custom data collection, **using Azure AI Studio** and the associated CLI, SDK and Azure AI Services. Before we dive in, let's talk about some of the core terms and concepts we will be using.
+This tutorial walks you through the steps to build, use, and evaluate, a copilot implementation on a custom data collection, **using Azure AI Studio** and the associated CLI, SDK, PromptFlow, and Azure AI Services. Before we dive in, let's talk about some of the core terms and concepts we will be using.
 
 ### What is Azure AI Studio?
 
@@ -38,6 +38,17 @@ A "copilot" is an application that uses modern AI and large language models (LLM
 
 [Retrieval Augmented Generation (RAG)](https://learn.microsoft.com/azure/search/retrieval-augmented-generation-overview?WT.mc_id=academic-112432-pablolopes) is an architecture or pattern where you _augment_ the capability of the default Large Language Model (LLM) by adding an _information retrieval system_ that gives you more control over the data used by the LLM in generating responses. When a user asks a "question", the copilot can retrieve matching results from this system and combine it with the question to form the prompt provided to the LLM, to generate the final answer.
 
+### What is PromptFlow?
+
+[PromptFlow](https://learn.microsoft.com/en-us/azure/machine-learning/prompt-flow/overview-what-is-prompt-flow?view=azureml-api-2?WT.mc_id=academic-112432-pablolopes) is a tool made to simplify the process to build fully fledged AI solutions for the process of prototyping, experimenting, iterating, and deploying your AI applications. 
+
+With PromptFlow, you can:
+- Create executable flows, linking LLMs prompts and Python tools through a graph.
+- Debug, share, and iterate your flows with ease with team collaboration.
+- Create prompt variants and evaluate their performance through large-scale testing.
+- Deploy a real-time endpoint that unlocks the full power of LLMs for your application.
+
+
 ### What is Azure AI Search? 
 
 [Azure AI Search](https://learn.microsoft.com/azure/search/search-what-is-azure-search?WT.mc_id=academic-112432-pablolopes) (formerly called _Azure Cognitive Search_) is a cloud-based search service that provides tools, APIs and infrastructure to **support information retrieval at scale** over private, heterogeneous data sources - with applicability to traditional and conversational search solutions. It is a [proven solution for information retrieval in a RAG architecture](https://github.com/Azure-Samples/azure-search-openai-demo) and can be easily created and managed from the Azure AI Studio UI - or programmatically, using Azure AI SDK or CLI. We'll make good use of this capability in our tutorial, to develop our copilot solution.
@@ -48,6 +59,7 @@ A "copilot" is an application that uses modern AI and large language models (LLM
 1. [Azure AI Studio](https://aka.ms/azureaistudio) - UI to explore, build & manage AI solutions.
 1. [Azure AI Studio Docs](https://aka.ms/azureaistudio/docs) - Azure AI Studio documentation.
 1. [Azure AI Services](https://learn.microsoft.com/azure/ai-services/what-are-ai-services?WT.mc_id=academic-112432-pablolopes) - Azure AI Services documentation.
+1. [PromptFlow Docs](https://learn.microsoft.com/en-us/azure/machine-learning/prompt-flow/overview-what-is-prompt-flow?view=azureml-api-2?WT.mc_id=academic-112432-pablolopes) - PromptFlow Guides and Documentation
 1. [Training: Using vector search in Azure Cognitive Search](https://learn.microsoft.com/training/modules/improve-search-results-vector-search?WT.mc_id=academic-112432-pablolopes) 
 1. [Tutorial: Deploy a web app for chat on your data](https://learn.microsoft.com/azure/ai-studio/tutorials/deploy-chat-web-app?WT.mc_id=academic-112432-pablolopes) 
 
