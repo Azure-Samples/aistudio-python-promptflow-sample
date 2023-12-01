@@ -68,7 +68,33 @@ We need to establish the connections with our Azure AI backend, the connections 
 
 With this, we should be able to run our demo. Repeat the steps for the two connections.
 
-## 4.4 Run the Demo
+## 4.4 Run the Demo in PromptFlow
+
+Now, let's experiment with the PromptFlow. 
+
+First, check if the Inputs in the PromptFlow are filled. If not add them to test if the PromptFlow connection is working propely.
+
+![Input PromptFlow](../img/50-RunPromptFlowLocally.png)
+
+If it does not looks like it. Do the following steps.
+
+1. Use the `Add Input` button.
+
+1. Add the `question` input, use the `String` Type.
+
+1. Use the sample question: `What can you tell me about your jackets?`.
+
+1. Now, add the `customerId` input, use the `int` type.
+
+1. Use `2` as the int. 
+
+It should look like the above sample. Now, run the demo with the PromptFlow interface or use `Shift + F5`
+
+![Run PromptFlow](../img/51-RunPromptFlowButton.png)
+
+Now, it should show the results in the terminal.
+
+## 4.5 Run the Demo in Azure AI
 
 To use the demo, run the following command: 
 
