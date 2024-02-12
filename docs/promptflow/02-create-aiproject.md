@@ -1,4 +1,29 @@
 # 2. Create AI Project Resources
+## Pre Requisites
+
+First, let's create our own Python virtual enviroment. 
+
+```
+python -3 -m venv .venv
+.venv\scripts\activate
+```
+
+Now, install all of the required packages on `requirements.txt`.
+
+```
+pip install -r requirements.txt
+```
+
+Finally, install the Azure AI CLI. 
+
+- On Linux:
+
+```
+curl -sL https://aka.ms/InstallAzureAICLIDeb | sudo bash
+```
+
+- On Windows or Mac, follow the instructions at [here](https://aka.ms/aistudio/docs/cli).
+
 ## 2.1 Azure AI CLI `help`
 1. **Validate Azure AI CLI.** Type `ai help` in the terminal in Visual Studio Code to validate it installed correctly. You should see an interactive help experience as shown below:
 

@@ -66,6 +66,8 @@ We need to establish the connections with our Azure AI backend, the connections 
 
     ![Status Connection](../img/47-StatusConnection.png)
 
+6. Verify that in the nodes that the correct connections are being selected to avoid any problems.
+
 With this, we should be able to run our demo. Repeat the steps for the two connections.
 
 ## 4.4 Run the Demo in PromptFlow
@@ -106,7 +108,8 @@ After running, PromptFlow will print some logs and shows the output.
 
 ![Running PromptFlow Results](../img/49-RunningPromptFlowPython.png)
 
-Now, we can run RAG with PromptFlow, enjoy this demo, test. 
-If you find any issues, open a PR.
+Now, we can run RAG with PromptFlow! However, how could we test this?
+
+Let's look on how to do it in the next lesson.
 
 

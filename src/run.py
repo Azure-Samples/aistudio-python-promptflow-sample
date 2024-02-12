@@ -15,12 +15,18 @@ import asyncio
 import platform
 import json
 import pathlib
+import pandas as pd
+
+from functools import partial
 
 from azure.ai.resources.client import AIClient
 from azure.ai.resources.entities.models import Model
 from azure.ai.resources.entities.deployment import Deployment
 from azure.identity import DefaultAzureCredential
 
+from openai.types.chat import ChatCompletion
+
+source_path = "./src"
 
 # build the index using the product catalog docs from data/3-product-info
 def build_cogsearch_index(index_name, path_to_data):
@@ -54,7 +60,7 @@ def build_cogsearch_index(index_name, path_to_data):
 
 
 # TEMP: wrapper around chat completion function until chat_completion protocol is supported
-def copilot_qna(question, chat_completion_fn):
+def copilot_qna(*, question, chat_completion_fn, **kwargs):
     # Call the async chat function with a single question and print the response
 
     if platform.system() == 'Windows':
@@ -63,11 +69,11 @@ def copilot_qna(question, chat_completion_fn):
     result = asyncio.run(
         chat_completion_fn([{"role": "user", "content": question}])
     )
-    response = result['choices'][0]
+
     return {
         "question": question,
-        "answer": response["message"]["content"],
-        "context": response["context"]
+        "answer": result.choices[0].message.content if isinstance(result, ChatCompletion) else result["choices"][0]["message"]["content"],
+        "context": result.choices[0].context if isinstance(result, ChatCompletion) else result["choices"][0]["context"]
     }
 
 
@@ -86,7 +92,8 @@ def run_evaluation(chat_completion_fn, name, dataset_path):
     dataset = load_jsonl(path)
 
     # temp: generate a single-turn qna wrapper over the chat completion function
-    qna_fn = lambda question: copilot_qna(question, chat_completion_fn)
+    qna_fn = partial(copilot_qna, chat_completion_fn=chat_completion_fn)
+    output_path = "./evaluation_output"
 
     client = AIClient.from_config(DefaultAzureCredential())
     result = evaluate(
@@ -94,11 +101,9 @@ def run_evaluation(chat_completion_fn, name, dataset_path):
         target=qna_fn,
         data=dataset,
         task_type="qa",
-        data_mapping={
-            "questions": "question",
-            "contexts": "context",
-            "y_pred": "answer",
-            "y_test": "truth"
+        data_mapping={ 
+            # Your data or output of target function need to contain "question", "answer", "context" and "grounth_truth" columns. Use data_mapping to match.
+            "ground_truth": "truth"
         },
         model_config={
             "api_version": "2023-05-15",
@@ -109,37 +114,46 @@ def run_evaluation(chat_completion_fn, name, dataset_path):
         },
         metrics_list=["exact_match", "gpt_groundedness", "gpt_relevance", "gpt_coherence"],
         tracking_uri=client.tracking_uri,
+        output_path=output_path,
     )
+    
+    tabular_result = pd.read_json(os.path.join(output_path, "eval_results.jsonl"), lines=True)
 
-    def read_eval_artifacts(result):
-        tabular_result = None
-        with tempfile.TemporaryDirectory() as tmpdir:
-            result.download_evaluation_artifacts(tmpdir)
-            import pandas as pd
-            pd.set_option('display.max_colwidth', 15)
-            pd.set_option('display.max_columns', None)
-            tabular_result = pd.read_json(os.path.join(tmpdir, "eval_results.jsonl"), lines=True)
-        return tabular_result
+    return result, tabular_result
 
-    return result.metrics_summary, read_eval_artifacts(result)
-
+def prepare_search_index(deployment_folder: str):
+    client = AIClient.from_config(DefaultAzureCredential())
+    search_index_name = os.getenv("AZURE_AI_SEARCH_INDEX_NAME")
+    search_index_folder = (search_index_name if search_index_name else "") + "-mlindex"
+    search_index_path = os.path.join(source_path, deployment_folder, search_index_folder)
+    if not os.path.exists(search_index_path):
+        try:
+            client.indexes.download(name=os.getenv("AZURE_AI_SEARCH_INDEX_NAME"),
+                                        download_path=search_index_path, label="latest")
+        except:
+            print("Please build the search index with 'python src/run.py --build-index'")
+            sys.exit(1)
 
 def deploy_flow(deployment_name, deployment_folder, chat_module):
     client = AIClient.from_config(DefaultAzureCredential())
+
     if not deployment_name:
         deployment_name = f"{client.project_name}-copilot"
     deployment = Deployment(
         name=deployment_name,
         model=Model(
-            path="./src",
+            path=source_path,
             conda_file=f"{deployment_folder}/conda.yaml",
             chat_module=chat_module,
         ),
         environment_variables={
             'OPENAI_API_TYPE': "${{azureml://connections/Default_AzureOpenAI/metadata/ApiType}}",
             'OPENAI_API_BASE': "${{azureml://connections/Default_AzureOpenAI/target}}",
+            'AZURE_OPENAI_ENDPOINT': "${{azureml://connections/Default_AzureOpenAI/target}}",
             'OPENAI_API_KEY': "${{azureml://connections/Default_AzureOpenAI/credentials/key}}",
+            'AZURE_OPENAI_KEY': "${{azureml://connections/Default_AzureOpenAI/credentials/key}}",
             'OPENAI_API_VERSION': "${{azureml://connections/Default_AzureOpenAI/metadata/ApiVersion}}",
+            'AZURE_OPENAI_API_VERSION': "${{azureml://connections/Default_AzureOpenAI/metadata/ApiVersion}}",
             'AZURE_AI_SEARCH_ENDPOINT': "${{azureml://connections/AzureAISearch/target}}",
             'AZURE_AI_SEARCH_KEY': "${{azureml://connections/AzureAISearch/credentials/key}}",
             'AZURE_AI_SEARCH_INDEX_NAME': os.getenv('AZURE_AI_SEARCH_INDEX_NAME'),
@@ -150,8 +164,9 @@ def deploy_flow(deployment_name, deployment_folder, chat_module):
             'AZURE_OPENAI_EMBEDDING_MODEL': os.getenv('AZURE_OPENAI_EMBEDDING_MODEL'),
             'AZURE_OPENAI_EMBEDDING_DEPLOYMENT': os.getenv('AZURE_OPENAI_EMBEDDING_DEPLOYMENT'),
         },
+        instance_count=1
     )
-    client.deployments.create_or_update(deployment)
+    client.deployments.begin_create_or_update(deployment)
 
 
 def invoke_deployment(deployment_name: str, stream: bool = False):
@@ -210,6 +225,7 @@ if __name__ == "__main__":
     parser.add_argument("--implementation", help="The implementation to use", default="aisdk", type=str)
     parser.add_argument("--deploy", help="Deploy copilot", action='store_true')
     parser.add_argument("--evaluate", help="Evaluate copilot", action='store_true')
+    parser.add_argument("--evaluation-name", help="evaluation name used to log the evaluation to AI Studio", type=str)
     parser.add_argument("--dataset-path", help="Test dataset to use with evaluation",
                         default="src/tests/evaluation_dataset.jsonl", action='store_true')
     parser.add_argument("--deployment-name", help="deployment name to use when deploying or invoking the flow", type=str)
@@ -218,7 +234,6 @@ if __name__ == "__main__":
     parser.add_argument("--invoke-deployment", help="Invoke a deployment and print out response", action="store_true")
     args = parser.parse_args()
 
-    check_local_index = False
     if args.implementation:
         if args.implementation == "promptflow":
             from copilot_promptflow.chat import chat_completion
@@ -235,7 +250,9 @@ if __name__ == "__main__":
 
             deployment_folder = "copilot_langchain"
             chat_module = "copilot_langchain.chat"
-            check_local_index = True
+
+            # Only LangChain uses local search index currently
+            prepare_search_index(deployment_folder)
         elif args.implementation == "aisdk":
             from copilot_aisdk.chat import chat_completion
 
@@ -245,12 +262,14 @@ if __name__ == "__main__":
     if args.build_index:
         build_cogsearch_index(os.getenv("AZURE_AI_SEARCH_INDEX_NAME"), "./data/3-product-info")
     elif args.evaluate:
-        metrics_summary, tabular_result = run_evaluation(chat_completion, name=f"test-{args.implementation}-copilot",
+        evaluation_name = args.evaluation_name if args.evaluation_name else f"test-{args.implementation}-copilot"
+        result, tabular_result = run_evaluation(chat_completion, name=evaluation_name,
                                  dataset_path=args.dataset_path)
         pprint("-----Summarized Metrics-----")
-        pprint(metrics_summary)
+        pprint(result.metrics_summary)
         pprint("-----Tabular Result-----")
         pprint(tabular_result)
+        pprint(f"View evaluation results in AI Studio: {result.studio_url}")
     elif args.deploy:
         deployment_name = args.deployment_name if args.deployment_name else None
         deploy_flow(deployment_name, deployment_folder, chat_module)
@@ -260,17 +279,6 @@ if __name__ == "__main__":
         question = "which tent is the most waterproof?"
         if args.question:
             question = args.question
-
-        # Prepare for the search index
-        search_index_folder = os.getenv("AZURE_AI_SEARCH_INDEX_NAME") + "-mlindex"
-        if check_local_index and not os.path.exists(search_index_folder):
-            client = AIClient.from_config(DefaultAzureCredential())
-            try:
-                client.mlindexes.download(name=os.getenv("AZURE_AI_SEARCH_INDEX_NAME"),
-                                          download_path=search_index_folder, label="latest")
-            except:
-                print("Please build the search index with 'python src/run.py --build-index'")
-                sys.exit(1)
 
         # Call the async chat function with a single question and print the response
         if args.stream:
@@ -285,3 +293,4 @@ if __name__ == "__main__":
                 chat_completion([{"role": "user", "content": question}], stream=False)
             )
             print(result)
+            
