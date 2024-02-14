@@ -23,7 +23,7 @@ Great, we are now set-up to start to add information to our Azure AI system. Do 
 
     ![Done Indexing](../img/34-DoneIndexing.png)
 
-## 3.2 Creating the .env
+## 3.2 Creating the AI Virtual Enviroment
 
 With everything ready, create your `.env` to create the PromptFlow connections and create the resources to be used with our code.
 

@@ -2,7 +2,6 @@
 
 This is the basic quickstart tutorial for the Azure AI Studio with PromptFlow. Find framework-specific versions here:
  - [Azure AI Studio SDK: Quickstart](https://github.com/Azure-Samples/aistudio-python-quickstart-sample)
- - [Azure AI Studio: Semantic Kernel Quickstart](https://github.com/Azure-Samples/aistudio-python-semantickernel-sample)
  - [Azure AI Studio: Langchain Quickstart](https://github.com/Azure-Samples/aistudio-python-langchain-sample)
 
 ## 🧰 | Explore features of Azure AI Studio
@@ -50,5 +49,5 @@ Ready to get started building a copilot with your own custom data?
 1. [Azure AI Studio](https://aka.ms/azureaistudio) - UI to explore, build & manage AI solutions.
 1. [Azure AI Studio Docs](https://aka.ms/azureaistudio/docs) - Azure AI Studio documentation.
 1. [Azure AI Services](https://learn.microsoft.com/azure/ai-services/what-are-ai-services?WT.mc_id=academic-112432-pablolopes) - Azure AI Services documentation.
-1. [Training: Using vector search in Azure Cognitive Search](https://learn.microsoft.com/training/modules/improve-search-results-vector-searc?WT.mc_id=academic-112432-pablolopesh) 
+1. [Training: Using vector search in Azure Cognitive Search](https://learn.microsoft.com/training/modules/improve-search-results-vector-searc?WT.mc_id=academic-112432-pablolopes) 
 1. [Tutorial: Deploy a web app for chat on your data](https://learn.microsoft.com/azure/ai-studio/tutorials/deploy-chat-web-app?WT.mc_id=academic-112432-pablolopes) 

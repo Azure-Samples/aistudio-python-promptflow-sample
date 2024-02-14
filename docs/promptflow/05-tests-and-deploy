@@ -1,0 +1,20 @@
+# 5. Testing and Deploying with Azure AI.
+
+## 5.1 Testing
+
+After everything is running smoothly. Test the flow in the CLI with the following command.
+
+`python src/run.py --question "which tent is the most waterproof?"  --implementation promptflow`
+
+## 5.2 Deployment
+
+To deploy, use the following command:
+
+```bash
+python src/run.py --deploy --deployment-name DEPLOYMENT_NAME
+```
+
+To test out the online enpoint, run:
+```bash
+python src/run.py --invoke 
+```
