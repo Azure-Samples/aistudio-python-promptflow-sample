@@ -2,7 +2,10 @@
 promptflow
 promptflow-tools
 keyrings.alt
+pytest
 
 #Azure dependencies
-azure-cosmos
+azureml-mlflow==1.53.0
 azure-search-documents==11.4.0b11
+azure-ai-resources
+azure-ai-generative[evaluate,index,promptflow]

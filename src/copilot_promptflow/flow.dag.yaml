@@ -54,7 +54,6 @@ nodes:
   provider: AzureOpenAI
   connection: Default_AzureOpenAI
   api: chat
-  module: promptflow.tools.aoai
 - name: customer_lookup
   type: python
   source:

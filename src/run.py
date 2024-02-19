@@ -240,27 +240,9 @@ if __name__ == "__main__":
 
             deployment_folder = "copilot_promptflow"
             chat_module = "copilot_promptflow.chat"
-        elif args.implementation == "semantickernel":
-            from copilot_semantickernel.chat import chat_completion
-
-            deployment_folder = "copilot_semantickernel"
-            chat_module = "copilot_semantickernel.chat"
-        elif args.implementation == "langchain":
-            from copilot_langchain.chat import chat_completion
-
-            deployment_folder = "copilot_langchain"
-            chat_module = "copilot_langchain.chat"
-
-            # Only LangChain uses local search index currently
-            prepare_search_index(deployment_folder)
-        elif args.implementation == "aisdk":
-            from copilot_aisdk.chat import chat_completion
-
-            deployment_folder = "copilot_aisdk"
-            chat_module = "copilot_aisdk.chat"
 
     if args.build_index:
-        build_cogsearch_index(os.getenv("AZURE_AI_SEARCH_INDEX_NAME"), "./data/3-product-info")
+        build_cogsearch_index(os.getenv("AZURE_AI_SEARCH_INDEX_NAME"), "./product-info")
     elif args.evaluate:
         evaluation_name = args.evaluation_name if args.evaluation_name else f"test-{args.implementation}-copilot"
         result, tabular_result = run_evaluation(chat_completion, name=evaluation_name,
@@ -293,4 +275,3 @@ if __name__ == "__main__":
                 chat_completion([{"role": "user", "content": question}], stream=False)
             )
             print(result)
-            
