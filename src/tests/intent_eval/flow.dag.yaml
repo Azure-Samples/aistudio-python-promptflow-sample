@@ -21,8 +21,8 @@ nodes:
     path: intent.jinja2
   inputs:
     question: ${inputs.question}
-    deployment_name: gpt-35-turbo-1106
-  connection: new OpenAI Connection
+    deployment_name: gpt-35-turbo-16k-0613
+  connection: Default_AzureOpenAI
   api: chat
 - name: assert_value
   type: python
