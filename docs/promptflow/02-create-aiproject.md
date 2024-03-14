@@ -3,10 +3,20 @@
 
 First, let's create our own Python virtual enviroment. 
 
+- On Windows:
+
 ```
 python -3 -m venv .venv
 .venv\scripts\activate
 ```
+
+- On Linux/Mac:
+
+```
+python -3 -m venv .venv
+source .venv/bin/activate
+```
+(note: the `-3` argument is only necessary if your default `python` version is not Python 3)
 
 Now, install all of the required packages on `requirements.txt`.
 
