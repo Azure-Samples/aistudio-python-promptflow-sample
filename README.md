@@ -1,3 +1,7 @@
+ ### :warning: WARNING: **This repository is deprecated and no longer maintained** :warning:
+|There is a new repository that covers the latest Azure AI code-first experiences. Navigate to and star this one instead: https://github.com/Azure-Samples/rag-data-openai-python-promptflow/tree/main|
+|---------------------------|
+
 # Azure AI Studio: Python PromptFlow Sample
 
 This is the basic quickstart tutorial for the Azure AI Studio with PromptFlow. Find framework-specific versions here:
